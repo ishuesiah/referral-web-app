@@ -4,16 +4,12 @@ from . import db
 
 bp = Blueprint('main', __name__)
 
-
-# @bp.route('/')
-# def home():
-#     # redirect anyone hitting / → /users
-#     return redirect(url_for('main.list_users'))
-
 @bp.route('/')
-def health():
-    return "OK", 200
-
+def home():
+    # either redirect to /users...
+    return redirect(url_for('main.list_users'))
+    # ...or just return OK:
+    # return "OK", 200
 
 @bp.route('/users')
 def list_users():
@@ -29,7 +25,7 @@ def list_users():
 
 @bp.route('/users/<int:user_id>/points', methods=['POST'])
 def update_points(user_id):
-    action = request.form.get('action')  # "add" or "subtract"
+    action = request.form.get('action')
     amount = int(request.form.get('amount', 1))
     user = User.query.get_or_404(user_id)
     if action == 'add':
