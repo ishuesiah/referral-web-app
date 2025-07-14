@@ -5,11 +5,8 @@ from . import db
 bp = Blueprint('main', __name__)
 
 @bp.route('/')
-def home():
-    # either redirect to /users...
-    return redirect(url_for('main.list_users'))
-    # ...or just return OK:
-    # return "OK", 200
+def health():
+    return "OK", 200
 
 @bp.route('/users')
 def list_users():
