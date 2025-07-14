@@ -10,15 +10,19 @@ def health():
 
 @bp.route('/users')
 def list_users():
-    q = request.args.get('q', '')
-    if q:
-        users = User.query.filter(
-            (User.first_name.ilike(f'%{q}%')) |
-            (User.email.ilike(f'%{q}%'))
-        ).all()
-    else:
-        users = User.query.all()
-    return render_template('users.html', users=users, q=q)
+    try:
+        q = request.args.get('q', '')
+        if q:
+            users = User.query.filter(
+                (User.first_name.ilike(f'%{q}%')) |
+                (User.email.ilike(f'%{q}%'))
+            ).all()
+        else:
+            users = User.query.all()
+        return render_template('users.html', users=users, q=q)
+    except Exception as e:
+        return f"<pre>Error in list_users():\n{e}</pre>", 500
+
 
 @bp.route('/users/<int:user_id>/points', methods=['POST'])
 def update_points(user_id):
