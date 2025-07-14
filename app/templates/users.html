@@ -1,24 +1,112 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Users</title>
+  <meta charset="utf-8">
+  <title>Referral Users</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2em;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    form.search {
+      text-align: center;
+      margin-bottom: 1em;
+    }
+    form.search input[type="text"] {
+      width: 250px;
+      padding: 0.5em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    form.search button {
+      padding: 0.5em 1em;
+      margin-left: 0.5em;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    form.search button:hover {
+      background-color: #0056b3;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 0.75em;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f7f7f7;
+    }
+    nav.pagination {
+      text-align: center;
+      margin-top: 1em;
+    }
+    nav.pagination a, nav.pagination span {
+      display: inline-block;
+      margin: 0 0.5em;
+      color: #007bff;
+      text-decoration: none;
+    }
+    nav.pagination .disabled {
+      color: #aaa;
+    }
+    /* Points adjustment input */
+    form.points-form {
+      display: inline-block;
+      margin: 0;
+    }
+    form.points-form input[type="number"] {
+      width: 60px;
+      padding: 0.3em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      text-align: right;
+    }
+    form.points-form button {
+      padding: 0.3em 0.6em;
+      border: none;
+      background-color: #28a745;
+      color: white;
+      border-radius: 4px;
+      margin-left: 0.3em;
+      cursor: pointer;
+    }
+    form.points-form button:hover {
+      background-color: #1e7e34;
+    }
+  </style>
 </head>
 <body>
   <h1>Referral Users</h1>
 
-  <form method="get" action="{{ url_for('main.list_users') }}">
-    <input type="text" name="q" value="{{ q }}" placeholder="Search by first name or email">
+  <form class="search" method="get" action="{{ url_for('main.list_users') }}">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search by name or email">
     <button type="submit">Search</button>
   </form>
 
-  <table border="1" cellpadding="5">
+  <table>
     <thead>
       <tr>
         <th>First Name</th>
         <th>Email</th>
         <th>Points</th>
-        <th>Actions</th>
+        <th>Adjust Points</th>
       </tr>
     </thead>
     <tbody>
@@ -28,17 +116,9 @@
         <td>{{ u.email }}</td>
         <td>{{ u.points }}</td>
         <td>
-          <form method="post"
-                action="{{ url_for('main.update_points', user_id=u.user_id) }}"
-                style="display:inline">
-            <input type="hidden" name="action" value="add">
-            <button type="submit">+1</button>
-          </form>
-          <form method="post"
-                action="{{ url_for('main.update_points', user_id=u.user_id) }}"
-                style="display:inline">
-            <input type="hidden" name="action" value="subtract">
-            <button type="submit">–1</button>
+          <form class="points-form" method="post" action="{{ url_for('main.update_points', user_id=u.user_id) }}">
+            <input type="number" name="amount" value="0" step="1" title="Enter positive or negative">
+            <button type="submit">Update</button>
           </form>
         </td>
       </tr>
@@ -47,5 +127,21 @@
       {% endfor %}
     </tbody>
   </table>
+
+  <nav class="pagination" aria-label="Page navigation">
+    {% if pagination.has_prev %}
+      <a href="{{ url_for('main.list_users', page=pagination.prev_num, q=q) }}">&laquo; Prev</a>
+    {% else %}
+      <span class="disabled">&laquo; Prev</span>
+    {% endif %}
+
+    <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+
+    {% if pagination.has_next %}
+      <a href="{{ url_for('main.list_users', page=pagination.next_num, q=q) }}">Next &raquo;</a>
+    {% else %}
+      <span class="disabled">Next &raquo;</span>
+    {% endif %}
+  </nav>
 </body>
 </html>

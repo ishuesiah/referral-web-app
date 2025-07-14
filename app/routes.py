@@ -10,28 +10,38 @@ def health():
 
 @bp.route('/users')
 def list_users():
-    try:
-        q = request.args.get('q', '')
-        if q:
-            users = User.query.filter(
-                (User.first_name.ilike(f'%{q}%')) |
-                (User.email.ilike(f'%{q}%'))
-            ).all()
-        else:
-            users = User.query.all()
-        return render_template('users.html', users=users, q=q)
-    except Exception as e:
-        return f"<pre>Error in list_users():\n{e}</pre>", 500
+    q       = request.args.get('q', '')
+    page    = request.args.get('page', 1, type=int)
+    per_page = 300
+
+    # build base query
+    query = User.query
+    if q:
+        query = query.filter(
+            (User.first_name.ilike(f'%{q}%')) |
+            (User.email.ilike(f'%{q}%'))
+        )
+
+    # paginate: returns a Pagination object
+    pagination = query.order_by(User.user_id) \
+                      .paginate(page=page, per_page=per_page, error_out=False)
+
+    users = pagination.items
+
+    return render_template(
+        'users.html',
+        users=pagination.items,
+        q=q,
+        pagination=pagination
+    )
+
 
 
 @bp.route('/users/<int:user_id>/points', methods=['POST'])
 def update_points(user_id):
-    action = request.form.get('action')
-    amount = int(request.form.get('amount', 1))
-    user = User.query.get_or_404(user_id)
-    if action == 'add':
-        user.points += amount
-    else:
-        user.points = max(0, user.points - amount)
+    amount = int(request.form.get('amount', 0))
+    user   = User.query.get_or_404(user_id)
+    user.points = max(0, user.points + amount)
     db.session.commit()
-    return redirect(url_for('main.list_users'))
+    return redirect(url_for('main.list_users', page=request.args.get('page', 1, type=int), q=request.args.get('q', '')))
+
