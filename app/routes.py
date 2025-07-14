@@ -4,6 +4,12 @@ from . import db
 
 bp = Blueprint('main', __name__)
 
+
+@bp.route('/')
+def home():
+    # redirect anyone hitting / → /users
+    return redirect(url_for('main.list_users'))
+
 @bp.route('/users')
 def list_users():
     q = request.args.get('q', '')
