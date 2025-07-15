@@ -1,11 +1,15 @@
 import os
+import time
+import bcrypt
 from flask import Blueprint, render_template, request, redirect, url_for, session
 from functools import wraps
-from werkzeug.security import check_password_hash
 from .models import User
 from . import db
 
 bp = Blueprint('main', __name__)
+
+# Load the bcrypt hash from environment (must be set as raw bytes)
+PASSWORD_HASH = os.getenv('ADMIN_PASSWORD_HASH', '').encode()
 
 @bp.route('/health')
 def health():
@@ -13,22 +17,26 @@ def health():
 
 @bp.route('/', methods=['GET', 'POST'])
 def login():
-    error = None
-    if request.method == 'POST':
-        pwd = request.form.get('password', '')
-        pwd_hash = os.getenv('ADMIN_PASSWORD_HASH', '')
-        if pwd_hash and check_password_hash(pwd_hash, pwd):
-            session['logged_in'] = True
+    error_msg = None
+    if request.method == "POST":
+        entered = request.form.get("password", "").encode()
+        if PASSWORD_HASH and bcrypt.checkpw(entered, PASSWORD_HASH):
+            session.clear()
+            session['authenticated'] = True
+            session['last_active'] = time.time()
             return redirect(url_for('main.list_users'))
-        error = 'Invalid password'
-    return render_template('login.html', error=error)
+        else:
+            error_msg = "Invalid password. Please try again."
+    return render_template('login.html', error=error_msg)
 
+# Decorator to protect routes
 
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not session.get('logged_in'):
+        if not session.get('authenticated'):
             return redirect(url_for('main.login'))
+        # Optionally check last_active for session timeout here
         return f(*args, **kwargs)
     return decorated_function
 
@@ -49,7 +57,9 @@ def list_users():
     pagination = query.order_by(User.user_id) \
                       .paginate(page=page, per_page=per_page, error_out=False)
 
-    return render_template('users.html', users=pagination.items, q=q, pagination=pagination)
+    return render_template(
+        'users.html', users=pagination.items, q=q, pagination=pagination
+    )
 
 @bp.route('/users/<int:user_id>/points', methods=['POST'])
 @login_required
