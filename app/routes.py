@@ -9,7 +9,7 @@ from . import db
 bp = Blueprint('main', __name__)
 
 # Load the bcrypt hash from environment (must be set as raw bytes)
-PASSWORD_HASH = os.getenv('ADMIN_PASSWORD_HASH', '').encode()
+PASSWORD_HASH = os.getenv('ADMIN_PASSWORD', '').encode()
 
 @bp.route('/health')
 def health():
