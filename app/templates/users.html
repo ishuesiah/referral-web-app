@@ -96,25 +96,37 @@
   <h1>Referral Users</h1>
 
   <form class="search" method="get" action="{{ url_for('main.list_users') }}">
-    <input type="text" name="q" value="{{ q }}" placeholder="Search by name or email">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search by name, email, referral code…">
     <button type="submit">Search</button>
   </form>
 
   <table>
     <thead>
       <tr>
+        <th>User ID</th>
+        <th>Shopify Customer ID</th>
         <th>First Name</th>
         <th>Email</th>
+        <th>Referral Code</th>
+        <th>Referred By</th>
+        <th>Last Discount Code</th>
         <th>Points</th>
+        <th>Created At</th>
         <th>Adjust Points</th>
       </tr>
     </thead>
     <tbody>
       {% for u in users %}
       <tr>
+        <td>{{ u.user_id }}</td>
+        <td>{{ u.shopify_customer_id or '—' }}</td>
         <td>{{ u.first_name or '(no name)' }}</td>
         <td>{{ u.email }}</td>
+        <td>{{ u.referral_code or '—' }}</td>
+        <td>{{ u.referred_by or '—' }}</td>
+        <td>{{ u.last_discount_code or '—' }}</td>
         <td>{{ u.points }}</td>
+        <td>{{ u.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
         <td>
           <form class="points-form" method="post" action="{{ url_for('main.update_points', user_id=u.user_id) }}">
             <input type="number" name="amount" value="0" step="1" title="Enter positive or negative">
@@ -123,7 +135,9 @@
         </td>
       </tr>
       {% else %}
-      <tr><td colspan="4">No users found.</td></tr>
+      <tr>
+        <td colspan="10">No users found.</td>
+      </tr>
       {% endfor %}
     </tbody>
   </table>
