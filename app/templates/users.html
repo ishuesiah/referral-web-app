@@ -118,15 +118,29 @@
     <tbody>
       {% for u in users %}
       <tr>
-        <td>{{ u.user_id }}</td>
-        <td>{{ u.shopify_customer_id or '—' }}</td>
-        <td>{{ u.first_name or '(no name)' }}</td>
-        <td>{{ u.email }}</td>
-        <td>{{ u.referral_code or '—' }}</td>
-        <td>{{ u.referred_by or '—' }}</td>
-        <td>{{ u.last_discount_code or '—' }}</td>
-        <td>{{ u.points }}</td>
-        <td>{{ u.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+         <td>{{ u.user_id }}</td>
+  <td>{{ u.shopify_customer_id or '—' }}</td>
+  <td>{{ u.first_name or '(no name)' }}</td>
+  <td>{{ u.last_name or '—' }}</td>
+  <td>{{ u.email }}</td>
+  <td>
+    {% if u.date_of_birth %}
+      {{ u.date_of_birth.strftime('%Y-%m-%d') }}
+    {% else %}
+      —
+    {% endif %}
+  </td>
+  <td>{{ u.membership_status or '—' }}</td>
+  <td>{{ u.vip_tier_name or '—' }}</td>
+  <td>{{ u.referral_code or '—' }}</td>
+  <td>{{ u.referral_discount_code or '—' }}</td>
+  <td>{{ u.discount_code_id or '—' }}</td>
+  <td>{{ u.referred_by or '—' }}</td>
+  <td>{{ u.referral_count or 0 }}</td>
+  <td>{{ u.referral_purchases_count or 0 }}</td>
+  <td>{{ u.last_discount_code or '—' }}</td>
+  <td>{{ u.points }}</td>
+  <td>{{ u.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
         <td>
           <form class="points-form" method="post" action="{{ url_for('main.update_points', user_id=u.user_id) }}">
             <input type="number" name="amount" value="0" step="1" title="Enter positive or negative">
