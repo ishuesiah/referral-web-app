@@ -123,13 +123,6 @@
   <td>{{ u.first_name or '(no name)' }}</td>
   <td>{{ u.last_name or '—' }}</td>
   <td>{{ u.email }}</td>
-  <td>
-    {% if u.date_of_birth %}
-      {{ u.date_of_birth.strftime('%Y-%m-%d') }}
-    {% else %}
-      —
-    {% endif %}
-  </td>
   <td>{{ u.membership_status or '—' }}</td>
   <td>{{ u.vip_tier_name or '—' }}</td>
   <td>{{ u.referral_code or '—' }}</td>
