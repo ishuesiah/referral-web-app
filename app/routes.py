@@ -51,7 +51,8 @@ def list_users():
     if q:
         query = query.filter(
             (User.first_name.ilike(f'%{q}%')) |
-            (User.email.ilike(f'%{q}%'))
+            (User.email.ilike(f'%{q}%') |
+            (User.referral_code.ilike(f'%{q}%'))
         )
 
     pagination = query.order_by(User.user_id) \
