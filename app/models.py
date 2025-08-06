@@ -18,7 +18,7 @@ class User(db.Model):
     referral_purchases_count   = db.Column(db.Integer, default=0, nullable=False)
 
     referral_code              = db.Column(db.String(50), unique=True, nullable=True)
-    referal_discount_code     = db.Column(db.Text, nullable=True)
+    referal_discount_code     = db.Column(db.JSON, nullable=True, default=dict)
     discount_code_id           = db.Column(db.Integer, nullable=True)
 
     referred_by                = db.Column(db.String(50), nullable=True)
