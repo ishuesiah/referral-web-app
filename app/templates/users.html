@@ -145,7 +145,15 @@
         <td>{{ u.membership_status or '—' }}</td>
         <td>{{ u.vip_tier_name or '—' }}</td>
         <td>{{ u.referral_code or '—' }}</td>
-        <td>{{ u.referral_discount_code or '—' }}</td>
+        <td>
+  {% if u.referral_discount_code %}
+    {% for threshold, code in u.referral_discount_code.items() %}
+      <div>{{ threshold }} referrals → <strong>{{ code }}</strong></div>
+    {% endfor %}
+  {% else %}
+    —
+  {% endif %}
+</td>
         <td>{{ u.discount_code_id or '—' }}</td>
         <td>{{ u.referred_by or '—' }}</td>
         <td>{{ u.referral_count or 0 }}</td>
