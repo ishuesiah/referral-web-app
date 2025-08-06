@@ -49,10 +49,13 @@ def list_users():
 
     query = User.query
     if q:
-        query = query.filter(
-            (User.first_name.ilike(f'%{q}%')) |
-            (User.email.ilike(f'%{q}%'))
-        )
+        query = query.filter(or_(
+            User.first_name.ilike(f'%{q}%'),
+            User.email.ilike(f'%{q}%'),
+            User.referral_code.ilike(f'%{q}%'),
+            # cast the JSON column to text so you can search inside it:
+            cast(User.referral_discount_code, Text).ilike(f'%{q}%')
+        ))
 
     pagination = query.order_by(User.user_id) \
                       .paginate(page=page, per_page=per_page, error_out=False)
