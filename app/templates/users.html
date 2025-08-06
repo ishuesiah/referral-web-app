@@ -38,13 +38,14 @@
     table {
       width: 100%;
       border-collapse: collapse;
+      border: 1px solid #ddd;
       background: white;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     th, td {
       padding: 0.75em;
       text-align: left;
-      border-bottom: 1px solid #eee;
+      border: 1px solid #ddd;
     }
     th {
       background-color: #007bff;
@@ -52,6 +53,9 @@
     }
     tr:nth-child(even) {
       background-color: #f7f7f7;
+    }
+    tr:hover {
+      background-color: #eaeaea;
     }
     nav.pagination {
       text-align: center;
@@ -101,75 +105,74 @@
   </form>
 
   <table>
-  <thead>
-    <tr>
-      <th>User ID</th>
-      <th>Shopify Customer ID</th>
-      <th>First Name</th>
-      <th>Last Name</th>
-      <th>Date of Birth</th>
-      <th>Email</th>
-      <th>Membership Status</th>
-      <th>VIP Tier</th>
-      <th>Referral Code</th>
-      <th>Referral Discount Code</th>
-      <th>Discount Code ID</th>
-      <th>Referred By</th>
-      <th>Referral Count</th>
-      <th>Referral Purchases Count</th>
-      <th>Last Discount Code</th>
-      <th>Points</th>
-      <th>Created At</th>
-      <th>Adjust Points</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for u in users %}
-    <tr>
-      <td>{{ u.user_id }}</td>
-      <td>{{ u.shopify_customer_id or '—' }}</td>
-      <td>{{ u.first_name or '(no name)' }}</td>
-      <td>{{ u.last_name or '—' }}</td>
-      <td>
-        {% if u.date_of_birth %}
-          {{ u.date_of_birth.strftime('%Y-%m-%d') }}
-        {% else %}
-          —
-        {% endif %}
-      </td>
-      <td>{{ u.email }}</td>
-      <td>{{ u.membership_status or '—' }}</td>
-      <td>{{ u.vip_tier_name or '—' }}</td>
-      <td>{{ u.referral_code or '—' }}</td>
-      <td>{{ u.referral_discount_code or '—' }}</td>
-      <td>{{ u.discount_code_id or '—' }}</td>
-      <td>{{ u.referred_by or '—' }}</td>
-      <td>{{ u.referral_count or 0 }}</td>
-      <td>{{ u.referral_purchases_count or 0 }}</td>
-      <td>{{ u.last_discount_code or '—' }}</td>
-      <td>{{ u.points }}</td>
-      <td>{{ u.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-      <td>
-        <form class="points-form"
-              method="post"
-              action="{{ url_for('main.update_points', user_id=u.user_id) }}">
-          <input type="number"
-                 name="amount"
-                 value="0"
-                 step="1"
-                 title="Enter positive or negative">
-          <button type="submit">Update</button>
-        </form>
-      </td>
-    </tr>
-    {% else %}
-    <tr>
-      <td colspan="18">No users found.</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Shopify Customer ID</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Date of Birth</th>
+        <th>Email</th>
+        <th>Membership Status</th>
+        <th>VIP Tier</th>
+        <th>Referral Code</th>
+        <th>Referral Discount Code</th>
+        <th>Discount Code ID</th>
+        <th>Referred By</th>
+        <th>Referral Count</th>
+        <th>Referral Purchases Count</th>
+        <th>Last Discount Code</th>
+        <th>Points</th>
+        <th>Created At</th>
+        <th>Adjust Points</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.user_id }}</td>
+        <td>{{ u.shopify_customer_id or '—' }}</td>
+        <td>{{ u.first_name or '(no name)' }}</td>
+        <td>{{ u.last_name or '—' }}</td>
+        <td>
+          {% if u.date_of_birth %}
+            {{ u.date_of_birth.strftime('%Y-%m-%d') }}
+          {% else %}
+            —
+          {% endif %}
+        </td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.membership_status or '—' }}</td>
+        <td>{{ u.vip_tier_name or '—' }}</td>
+        <td>{{ u.referral_code or '—' }}</td>
+        <td>{{ u.referral_discount_code or '—' }}</td>
+        <td>{{ u.discount_code_id or '—' }}</td>
+        <td>{{ u.referred_by or '—' }}</td>
+        <td>{{ u.referral_count or 0 }}</td>
+        <td>{{ u.referral_purchases_count or 0 }}</td>
+        <td>{{ u.last_discount_code or '—' }}</td>
+        <td>{{ u.points }}</td>
+        <td>{{ u.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>
+          <form class="points-form"
+                method="post"
+                action="{{ url_for('main.update_points', user_id=u.user_id) }}">
+            <input type="number"
+                   name="amount"
+                   value="0"
+                   step="1"
+                   title="Enter positive or negative">
+            <button type="submit">Update</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="18">No users found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
   <nav class="pagination" aria-label="Page navigation">
     {% if pagination.has_prev %}
