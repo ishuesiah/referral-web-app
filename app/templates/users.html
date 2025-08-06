@@ -146,8 +146,8 @@
         <td>{{ u.vip_tier_name or '—' }}</td>
         <td>{{ u.referral_code or '—' }}</td>
         <td>
-  {% if u.referral_discount_code %}
-    {% for threshold, code in u.referral_discount_code.items() %}
+  {% if u.referal_discount_code %}
+    {% for threshold, code in u.referal_discount_code.items() %}
       <div>{{ threshold }} referrals → <strong>{{ code }}</strong></div>
     {% endfor %}
   {% else %}
