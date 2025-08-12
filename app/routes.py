@@ -44,6 +44,7 @@ def login_required(f):
 @login_required
 def list_users():
     q = request.args.get('q', '')
+    sort = request.args.get('sort', 'newest')  # default to newest
     page = request.args.get('page', 1, type=int)
     per_page = 300
 
@@ -55,12 +56,22 @@ def list_users():
             (User.referral_code.ilike(f'%{q}%'))
         )
 
-    pagination = query.order_by(User.user_id) \
-                      .paginate(page=page, per_page=per_page, error_out=False)
+    # Apply sort order
+    if sort == 'oldest':
+        query = query.order_by(User.created_at.asc())
+    else:  # newest
+        query = query.order_by(User.created_at.desc())
+
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
 
     return render_template(
-        'users.html', users=pagination.items, q=q, pagination=pagination
+        'users.html',
+        users=pagination.items,
+        q=q,
+        sort=sort,
+        pagination=pagination
     )
+
 
 @bp.route('/users/<int:user_id>/points', methods=['POST'])
 @login_required
