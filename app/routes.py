@@ -304,7 +304,6 @@ def get_user_earned_actions(email):
     return jsonify({'earned': earned_keys})
 
 @bp.route('/create-tables-temp')
-@login_required
 def create_tables():
     try:
         db.create_all()
