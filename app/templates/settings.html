@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Rewards Settings - H&O Admin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2em;
+      background-color: #f9f9f9;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 1em;
+      margin-bottom: 2em;
+      border-bottom: 2px solid #007bff;
+    }
+    .nav-tab {
+      padding: 0.5em 1em;
+      text-decoration: none;
+      color: #333;
+      border-radius: 4px 4px 0 0;
+    }
+    .nav-tab.active {
+      background-color: #007bff;
+      color: white;
+    }
+    .settings-form {
+      background: white;
+      padding: 2em;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .form-group {
+      margin-bottom: 1.5em;
+    }
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.5em;
+      color: #555;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 0.5em;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1em;
+    }
+    .form-group small {
+      display: block;
+      margin-top: 0.3em;
+      color: #777;
+      font-size: 0.9em;
+    }
+    .btn-primary {
+      padding: 0.75em 2em;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+    .flash-message {
+      padding: 1em;
+      margin-bottom: 1em;
+      border-radius: 4px;
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Rewards Program Settings</h1>
+    
+    <!-- Navigation tabs -->
+    <div class="nav-tabs">
+      <a href="{{ url_for('main.list_users') }}" class="nav-tab">Users</a>
+      <a href="{{ url_for('main.settings') }}" class="nav-tab active">Settings</a>
+      <a href="{{ url_for('main.manage_rewards') }}" class="nav-tab">Rewards</a>
+      <a href="{{ url_for('main.manage_earn_actions') }}" class="nav-tab">Earn Actions</a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="settings-form">
+      <form method="POST" action="{{ url_for('main.update_settings') }}">
+        
+        <h2>Referral Program</h2>
+        
+        <div class="form-group">
+          <label for="config_referral_give_amount">Give Amount (CAD)</label>
+          <input type="number" 
+                 id="config_referral_give_amount" 
+                 name="config_referral_give_amount" 
+                 value="{{ configs.get('referral_give_amount').value if 'referral_give_amount' in configs else '15' }}"
+                 min="0" step="1">
+          <small>Amount the referred friend gets off their first purchase</small>
+        </div>
+
+        <div class="form-group">
+          <label for="config_referral_get_amount">Get Amount (CAD)</label>
+          <input type="number" 
+                 id="config_referral_get_amount" 
+                 name="config_referral_get_amount" 
+                 value="{{ configs.get('referral_get_amount').value if 'referral_get_amount' in configs else '15' }}"
+                 min="0" step="1">
+          <small>Amount in points the referrer gets when friend makes purchase</small>
+        </div>
+
+        <div class="form-group">
+          <label for="config_referral_goal">Referral Goal</label>
+          <input type="number" 
+                 id="config_referral_goal" 
+                 name="config_referral_goal" 
+                 value="{{ configs.get('referral_goal').value if 'referral_goal' in configs else '50' }}"
+                 min="1" step="1">
+          <small>Target number of referrals shown in progress bar</small>
+        </div>
+
+        <h2>Points System</h2>
+        
+        <div class="form-group">
+          <label for="config_signup_bonus_points">Signup Bonus Points</label>
+          <input type="number" 
+                 id="config_signup_bonus_points" 
+                 name="config_signup_bonus_points" 
+                 value="{{ configs.get('signup_bonus_points').value if 'signup_bonus_points' in configs else '100' }}"
+                 min="0" step="10">
+          <small>Points awarded when someone signs up for the program</small>
+        </div>
+
+        <div class="form-group">
+          <label for="config_points_per_dollar">Points Per Dollar Spent</label>
+          <input type="number" 
+                 id="config_points_per_dollar" 
+                 name="config_points_per_dollar" 
+                 value="{{ configs.get('points_per_dollar').value if 'points_per_dollar' in configs else '5' }}"
+                 min="0" step="1">
+          <small>Number of points earned for each dollar spent on purchases</small>
+        </div>
+
+        <button type="submit" class="btn-primary">Save Settings</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
