@@ -1,1 +1,174 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{% if reward %}Edit{% else %}Add{% endif %} Reward - H&O Admin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2em;
+      background-color: #f9f9f9;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    .form-container {
+      background: white;
+      padding: 2em;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .form-group {
+      margin-bottom: 1.5em;
+    }
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.5em;
+      color: #555;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 0.5em;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1em;
+    }
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+    }
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+    }
+    .form-actions {
+      display: flex;
+      gap: 1em;
+      justify-content: space-between;
+    }
+    .btn {
+      padding: 0.75em 2em;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1em;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary {
+      background-color: #007bff;
+      color: white;
+    }
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+    .btn-secondary {
+      background-color: #6c757d;
+      color: white;
+    }
+    .btn-secondary:hover {
+      background-color: #545b62;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>{% if reward %}Edit{% else %}Add New{% endif %} Reward</h1>
+    
+    <div class="form-container">
+      <form method="POST">
+        <div class="form-group">
+          <label for="name">Reward Name *</label>
+          <input type="text" 
+                 id="name" 
+                 name="name" 
+                 value="{{ reward.name if reward else '' }}" 
+                 placeholder="e.g., $10 off coupon"
+                 required>
+        </div>
+        
+        <div class="form-group">
+          <label for="points_required">Points Required *</label>
+          <input type="number" 
+                 id="points_required" 
+                 name="points_required" 
+                 value="{{ reward.points_required if reward else '' }}" 
+                 placeholder="e.g., 1000"
+                 min="0" 
+                 required>
+        </div>
+        
+        <div class="form-group">
+          <label for="reward_value">Reward Value *</label>
+          <input type="text" 
+                 id="reward_value" 
+                 name="reward_value" 
+                 value="{{ reward.reward_value if reward else '' }}" 
+                 placeholder="e.g., 10CAD or dynamic"
+                 required>
+          <small style="color: #666; display: block; margin-top: 0.3em;">
+            Use format like "10CAD" for fixed discounts or "dynamic" for variable rewards
+          </small>
+        </div>
+        
+        <div class="form-group">
+          <label for="reward_type">Reward Type</label>
+          <select id="reward_type" name="reward_type">
+            <option value="discount" {% if reward and reward.reward_type == 'discount' %}selected{% endif %}>Discount</option>
+            <option value="product" {% if reward and reward.reward_type == 'product' %}selected{% endif %}>Free Product</option>
+            <option value="shipping" {% if reward and reward.reward_type == 'shipping' %}selected{% endif %}>Free Shipping</option>
+            <option value="experience" {% if reward and reward.reward_type == 'experience' %}selected{% endif %}>Experience/VIP</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="description">Description (Optional)</label>
+          <textarea id="description" 
+                    name="description" 
+                    placeholder="Additional details about this reward...">{{ reward.description if reward else '' }}</textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="display_order">Display Order</label>
+          <input type="number" 
+                 id="display_order" 
+                 name="display_order" 
+                 value="{{ reward.display_order if reward else 0 }}" 
+                 min="0">
+          <small style="color: #666; display: block; margin-top: 0.3em;">
+            Lower numbers appear first
+          </small>
+        </div>
+        
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" 
+                   id="is_active" 
+                   name="is_active" 
+                   {% if not reward or reward.is_active %}checked{% endif %}>
+            <label for="is_active">Active (visible to customers)</label>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">
+            {% if reward %}Update{% else %}Create{% endif %} Reward
+          </button>
+          <a href="{{ url_for('main.manage_rewards') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
