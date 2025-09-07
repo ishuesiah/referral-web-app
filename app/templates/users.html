@@ -2,16 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Referral Users</title>
+  <title>Referral Users - H&O Admin</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 2em;
       background-color: #f9f9f9;
     }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
     h1 {
       color: #333;
       text-align: center;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 1em;
+      margin-bottom: 2em;
+      border-bottom: 2px solid #007bff;
+    }
+    .nav-tab {
+      padding: 0.5em 1em;
+      text-decoration: none;
+      color: #333;
+      border-radius: 4px 4px 0 0;
+    }
+    .nav-tab.active {
+      background-color: #007bff;
+      color: white;
     }
     form.search {
       text-align: center;
@@ -22,6 +42,12 @@
       padding: 0.5em;
       border: 1px solid #ccc;
       border-radius: 4px;
+    }
+    form.search select {
+      padding: 0.5em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-left: 0.5em;
     }
     form.search button {
       padding: 0.5em 1em;
@@ -94,115 +120,138 @@
     form.points-form button:hover {
       background-color: #1e7e34;
     }
+    .flash-message {
+      padding: 1em;
+      margin-bottom: 1em;
+      border-radius: 4px;
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
   </style>
 </head>
 <body>
-  <h1>Referral Users</h1>
+  <div class="container">
+    <h1>Referral Users</h1>
+    
+    <!-- Navigation tabs -->
+    <div class="nav-tabs">
+      <a href="{{ url_for('main.list_users') }}" class="nav-tab active">Users</a>
+      <a href="{{ url_for('main.settings') }}" class="nav-tab">Settings</a>
+      <a href="{{ url_for('main.manage_rewards') }}" class="nav-tab">Rewards</a>
+      <a href="{{ url_for('main.manage_earn_actions') }}" class="nav-tab">Earn Actions</a>
+    </div>
 
-<form class="search" method="get" action="{{ url_for('main.list_users') }}">
-  <input type="text" name="q" value="{{ q }}" placeholder="Search by name, email, referral code…">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 
-  <select name="sort">
-    <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
-    <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest</option>
-  </select>
+    <form class="search" method="get" action="{{ url_for('main.list_users') }}">
+      <input type="text" name="q" value="{{ q }}" placeholder="Search by name, email, referral code…">
+      <select name="sort">
+        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+        <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest</option>
+      </select>
+      <button type="submit">Search</button>
+    </form>
 
-  <button type="submit">Search</button>
-</form>
+    <table>
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>Shopify Customer ID</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Date of Birth</th>
+          <th>Email</th>
+          <th>Membership Status</th>
+          <th>VIP Tier</th>
+          <th>Referral Code</th>
+          <th>Referral Discount Code</th>
+          <th>Discount Code ID</th>
+          <th>Referred By</th>
+          <th>Referral Count</th>
+          <th>Referral Purchases Count</th>
+          <th>Last Discount Code</th>
+          <th>Points</th>
+          <th>Created At</th>
+          <th>Adjust Points</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ u.user_id }}</td>
+          <td>{{ u.shopify_customer_id or '—' }}</td>
+          <td>{{ u.first_name or '(no name)' }}</td>
+          <td>{{ u.last_name or '—' }}</td>
+          <td>
+            {% if u.date_of_birth %}
+              {{ u.date_of_birth.strftime('%Y-%m-%d') }}
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td>{{ u.email }}</td>
+          <td>{{ u.membership_status or '—' }}</td>
+          <td>{{ u.vip_tier_name or '—' }}</td>
+          <td>{{ u.referral_code or '—' }}</td>
+          <td>
+            {% if u.referal_discount_code %}
+              {% for threshold, code in u.referal_discount_code.items() %}
+                <div>{{ threshold }} referrals → <strong>{{ code }}</strong></div>
+              {% endfor %}
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td>{{ u.discount_code_id or '—' }}</td>
+          <td>{{ u.referred_by or '—' }}</td>
+          <td>{{ u.referral_count or 0 }}</td>
+          <td>{{ u.referral_purchases_count or 0 }}</td>
+          <td>{{ u.last_discount_code or '—' }}</td>
+          <td>{{ u.points }}</td>
+          <td>{{ u.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+          <td>
+            <form class="points-form"
+                  method="post"
+                  action="{{ url_for('main.update_points', user_id=u.user_id) }}">
+              <input type="number"
+                     name="amount"
+                     value="0"
+                     step="1"
+                     title="Enter positive or negative">
+              <button type="submit">Update</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="18">No users found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
-
-  <table>
-    <thead>
-      <tr>
-        <th>User ID</th>
-        <th>Shopify Customer ID</th>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Date of Birth</th>
-        <th>Email</th>
-        <th>Membership Status</th>
-        <th>VIP Tier</th>
-        <th>Referral Code</th>
-        <th>Referral Discount Code</th>
-        <th>Discount Code ID</th>
-        <th>Referred By</th>
-        <th>Referral Count</th>
-        <th>Referral Purchases Count</th>
-        <th>Last Discount Code</th>
-        <th>Points</th>
-        <th>Created At</th>
-        <th>Adjust Points</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for u in users %}
-      <tr>
-        <td>{{ u.user_id }}</td>
-        <td>{{ u.shopify_customer_id or '—' }}</td>
-        <td>{{ u.first_name or '(no name)' }}</td>
-        <td>{{ u.last_name or '—' }}</td>
-        <td>
-          {% if u.date_of_birth %}
-            {{ u.date_of_birth.strftime('%Y-%m-%d') }}
-          {% else %}
-            —
-          {% endif %}
-        </td>
-        <td>{{ u.email }}</td>
-        <td>{{ u.membership_status or '—' }}</td>
-        <td>{{ u.vip_tier_name or '—' }}</td>
-        <td>{{ u.referral_code or '—' }}</td>
-        <td>
-  {% if u.referal_discount_code %}
-    {% for threshold, code in u.referal_discount_code.items() %}
-      <div>{{ threshold }} referrals → <strong>{{ code }}</strong></div>
-    {% endfor %}
-  {% else %}
-    —
-  {% endif %}
-</td>
-        <td>{{ u.discount_code_id or '—' }}</td>
-        <td>{{ u.referred_by or '—' }}</td>
-        <td>{{ u.referral_count or 0 }}</td>
-        <td>{{ u.referral_purchases_count or 0 }}</td>
-        <td>{{ u.last_discount_code or '—' }}</td>
-        <td>{{ u.points }}</td>
-        <td>{{ u.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-        <td>
-          <form class="points-form"
-                method="post"
-                action="{{ url_for('main.update_points', user_id=u.user_id) }}">
-            <input type="number"
-                   name="amount"
-                   value="0"
-                   step="1"
-                   title="Enter positive or negative">
-            <button type="submit">Update</button>
-          </form>
-        </td>
-      </tr>
+    <nav class="pagination" aria-label="Page navigation">
+      {% if pagination.has_prev %}
+        <a href="{{ url_for('main.list_users', page=pagination.prev_num, q=q) }}">&laquo; Prev</a>
       {% else %}
-      <tr>
-        <td colspan="18">No users found.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+        <span class="disabled">&laquo; Prev</span>
+      {% endif %}
 
-  <nav class="pagination" aria-label="Page navigation">
-    {% if pagination.has_prev %}
-      <a href="{{ url_for('main.list_users', page=pagination.prev_num, q=q) }}">&laquo; Prev</a>
-    {% else %}
-      <span class="disabled">&laquo; Prev</span>
-    {% endif %}
+      <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
 
-    <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
-
-    {% if pagination.has_next %}
-      <a href="{{ url_for('main.list_users', page=pagination.next_num, q=q) }}">Next &raquo;</a>
-    {% else %}
-      <span class="disabled">Next &raquo;</span>
-    {% endif %}
-  </nav>
+      {% if pagination.has_next %}
+        <a href="{{ url_for('main.list_users', page=pagination.next_num, q=q) }}">Next &raquo;</a>
+      {% else %}
+        <span class="disabled">Next &raquo;</span>
+      {% endif %}
+    </nav>
+  </div>
 </body>
 </html>
