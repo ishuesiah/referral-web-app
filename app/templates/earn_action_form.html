@@ -1,1 +1,231 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{% if action %}Edit{% else %}Add{% endif %} Earn Action - H&O Admin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2em;
+      background-color: #f9f9f9;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    .form-container {
+      background: white;
+      padding: 2em;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .form-group {
+      margin-bottom: 1.5em;
+    }
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.5em;
+      color: #555;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 0.5em;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1em;
+    }
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      margin-bottom: 0.5em;
+    }
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+    }
+    .form-actions {
+      display: flex;
+      gap: 1em;
+      justify-content: space-between;
+    }
+    .btn {
+      padding: 0.75em 2em;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1em;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary {
+      background-color: #007bff;
+      color: white;
+    }
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+    .btn-secondary {
+      background-color: #6c757d;
+      color: white;
+    }
+    .btn-secondary:hover {
+      background-color: #545b62;
+    }
+    .example-section {
+      background-color: #f8f9fa;
+      padding: 1em;
+      border-radius: 4px;
+      margin-top: 1em;
+    }
+    .example-section h3 {
+      margin-top: 0;
+      color: #495057;
+      font-size: 0.9em;
+    }
+    .example-list {
+      font-size: 0.85em;
+      color: #6c757d;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>{% if action %}Edit{% else %}Add New{% endif %} Earn Action</h1>
+    
+    <div class="form-container">
+      <form method="POST">
+        <div class="form-group">
+          <label for="name">Action Name *</label>
+          <input type="text" 
+                 id="name" 
+                 name="name" 
+                 value="{{ action.name if action else '' }}" 
+                 placeholder="e.g., Follow on Instagram"
+                 required>
+        </div>
+        
+        <div class="form-group">
+          <label for="action_key">Action Key *</label>
+          <input type="text" 
+                 id="action_key" 
+                 name="action_key" 
+                 value="{{ action.action_key if action else '' }}" 
+                 placeholder="e.g., instagram_follow"
+                 pattern="[a-z0-9_]+"
+                 required>
+          <small style="color: #666; display: block; margin-top: 0.3em;">
+            Unique identifier using only lowercase letters, numbers, and underscores
+          </small>
+        </div>
+        
+        <div class="form-group">
+          <label for="points_awarded">Points Awarded *</label>
+          <input type="number" 
+                 id="points_awarded" 
+                 name="points_awarded" 
+                 value="{{ action.points_awarded if action else '' }}" 
+                 placeholder="e.g., 50"
+                 min="0" 
+                 required>
+        </div>
+        
+        <div class="form-group">
+          <label for="action_type">Action Type</label>
+          <select id="action_type" name="action_type">
+            <option value="social" {% if action and action.action_type == 'social' %}selected{% endif %}>Social Media</option>
+            <option value="instagram" {% if action and action.action_type == 'instagram' %}selected{% endif %}>Instagram</option>
+            <option value="facebook" {% if action and action.action_type == 'facebook' %}selected{% endif %}>Facebook</option>
+            <option value="youtube" {% if action and action.action_type == 'youtube' %}selected{% endif %}>YouTube</option>
+            <option value="twitter" {% if action and action.action_type == 'twitter' %}selected{% endif %}>Twitter/X</option>
+            <option value="tiktok" {% if action and action.action_type == 'tiktok' %}selected{% endif %}>TikTok</option>
+            <option value="community" {% if action and action.action_type == 'community' %}selected{% endif %}>Community</option>
+            <option value="newsletter" {% if action and action.action_type == 'newsletter' %}selected{% endif %}>Newsletter</option>
+            <option value="review" {% if action and action.action_type == 'review' %}selected{% endif %}>Review</option>
+            <option value="purchase" {% if action and action.action_type == 'purchase' %}selected{% endif %}>Purchase</option>
+            <option value="signup" {% if action and action.action_type == 'signup' %}selected{% endif %}>Signup</option>
+            <option value="other" {% if action and action.action_type == 'other' %}selected{% endif %}>Other</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="action_url">Action URL (Optional)</label>
+          <input type="url" 
+                 id="action_url" 
+                 name="action_url" 
+                 value="{{ action.action_url if action else '' }}" 
+                 placeholder="https://www.instagram.com/hemlockandoak">
+          <small style="color: #666; display: block; margin-top: 0.3em;">
+            Link that opens when user clicks the action button
+          </small>
+        </div>
+        
+        <div class="form-group">
+          <label for="icon">Icon (Optional)</label>
+          <input type="text" 
+                 id="icon" 
+                 name="icon" 
+                 value="{{ action.icon if action else '' }}" 
+                 placeholder="e.g., instagram or fa-instagram">
+          <small style="color: #666; display: block; margin-top: 0.3em;">
+            Icon identifier for display (depends on your icon library)
+          </small>
+        </div>
+        
+        <div class="form-group">
+          <label for="display_order">Display Order</label>
+          <input type="number" 
+                 id="display_order" 
+                 name="display_order" 
+                 value="{{ action.display_order if action else 0 }}" 
+                 min="0">
+          <small style="color: #666; display: block; margin-top: 0.3em;">
+            Lower numbers appear first
+          </small>
+        </div>
+        
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" 
+                   id="is_active" 
+                   name="is_active" 
+                   {% if not action or action.is_active %}checked{% endif %}>
+            <label for="is_active">Active (visible to customers)</label>
+          </div>
+          
+          <div class="checkbox-group">
+            <input type="checkbox" 
+                   id="is_repeatable" 
+                   name="is_repeatable" 
+                   {% if action and action.is_repeatable %}checked{% endif %}>
+            <label for="is_repeatable">Repeatable (can be done multiple times)</label>
+          </div>
+        </div>
+        
+        <div class="example-section">
+          <h3>Common Examples:</h3>
+          <div class="example-list">
+            • <strong>Instagram Follow:</strong> Key: instagram_follow, Points: 50<br>
+            • <strong>Facebook Like:</strong> Key: facebook_like, Points: 50<br>
+            • <strong>Leave a Review:</strong> Key: leave_review, Points: 100<br>
+            • <strong>Birthday Bonus:</strong> Key: birthday, Points: 200, Repeatable: Yes<br>
+            • <strong>First Purchase:</strong> Key: first_purchase, Points: 250
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">
+            {% if action %}Update{% else %}Create{% endif %} Action
+          </button>
+          <a href="{{ url_for('main.manage_earn_actions') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
