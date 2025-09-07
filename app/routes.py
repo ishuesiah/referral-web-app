@@ -302,11 +302,3 @@ def get_user_earned_actions(email):
     earned_keys = [ea.action.action_key for ea in earned if ea.action]
     
     return jsonify({'earned': earned_keys})
-
-@bp.route('/create-tables-temp')
-def create_tables():
-    try:
-        db.create_all()
-        return "Success! New tables created. Delete this route now."
-    except Exception as e:
-        return f"Error: {str(e)}"
